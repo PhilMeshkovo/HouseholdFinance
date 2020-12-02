@@ -36,7 +36,7 @@ class Main(tk.Frame):
 
         self.refresh_img = tk.PhotoImage(file='refresh.gif')
         btn_refrech = tk.Button(toolbar, text='Обновить', bg='#d7d8e0', bd=0, image=self.refresh_img,
-                               compound=tk.TOP, command=lambda: self.view_records())
+                                compound=tk.TOP, command=lambda: self.view_records())
         btn_refrech.pack(side=tk.LEFT)
 
         self.tree = ttk.Treeview(self, columns=('ID', 'description', 'costs', 'total'), height=15,
@@ -59,7 +59,7 @@ class Main(tk.Frame):
 
     def update_record(self, description, costs, total):
         self.db.c.execute('''UPDATE finance SET description=?, costs=?, total=? WHERE id=?''',
-                          (description, costs, total, self.tree.set(self.tree.selection()[0], '#1',)))
+                          (description, costs, total, self.tree.set(self.tree.selection()[0], '#1', )))
         self.db.conn.commit()
         self.view_records()
 
@@ -136,6 +136,8 @@ class Update(Child):
         super().__init__()
         self.init_edit()
         self.view = app
+        self.db = db
+        self.default_data()
 
     def init_edit(self):
         self.title('Редактировать позицию')
@@ -145,6 +147,15 @@ class Update(Child):
                                                                           self.combobox.get(),
                                                                           self.entry_money.get()))
         self.btn_ok.destroy()
+
+    def default_data(self):
+        self.db.c.execute('''SELECT * FROM finance WHERE id = ?''',
+                          (self.view.tree.set(self.view.tree.selection()[0], '#1'),))
+        row = self.db.c.fetchone()
+        self.entry_description.insert(0, row[1])
+        if row[2] != 'Доход':
+            self.combobox.current(1)
+        self.entry_money.insert(0, row[3])
 
 class Search(tk.Toplevel):
     def __init__(self):
