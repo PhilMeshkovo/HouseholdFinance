@@ -51,7 +51,12 @@ class Main(tk.Frame):
         self.tree.heading('costs', text='Статья дохода/расхода')
         self.tree.heading('total', text='Сумма')
 
-        self.tree.pack()
+        self.tree.pack(side=tk.LEFT)
+
+        scroll = tk.Scrollbar(self, command=self.tree.yview)
+        scroll.pack(side=tk.LEFT, fill=tk.Y)
+        self.tree.configure(yscrollcommand=scroll.set)
+
 
     def records(self, description, costs, total):
         self.db.insert_data(description, costs, total)
@@ -203,6 +208,6 @@ if __name__ == "__main__":
     app = Main(root)
     app.pack()
     root.title("HouseHold Finance")
-    root.geometry("650x450+300+200")
+    root.geometry("665x450+300+200")
     root.resizable(False, False)
     root.mainloop()
